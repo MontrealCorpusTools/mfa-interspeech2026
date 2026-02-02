@@ -46,6 +46,8 @@ if __name__ == "__main__":
         )
         count = 0
         for utterance, speaker, file, sound_file in query:
+            if not utterance.reference_word_intervals:
+                continue
             file_name = f"{file.name}_{utterance.begin:.3f}_{utterance.end:.3f}".replace('.', '_')
             word_count = utterance.normalized_text.count(" ") + 1
             oovs = set(utterance.oovs.split(','))
@@ -65,7 +67,7 @@ if __name__ == "__main__":
             tg_file_path = reference_speaker_directory.joinpath(file_name + ".TextGrid")
             wav_file_path = speaker_directory.joinpath(file_name + ".wav")
             with open(lab_file_path, 'w', encoding='utf8') as f:
-                f.write(utterance.text)
+                f.write(utterance.text.replace("(F", ''))
             if not wav_file_path.exists():
                 audio_segment = utterance.segment.load_audio()
                 sf.write(wav_file_path, audio_segment, 16000)

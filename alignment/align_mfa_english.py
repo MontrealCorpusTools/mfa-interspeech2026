@@ -20,47 +20,89 @@ mapping_directory = os.path.join(
 corpus_directories = {
     "timit": r"D:\Data\speech\benchmark_datasets\timit\timit_benchmark",
     "buckeye": r"D:\Data\speech\benchmark_datasets\buckeye\buckeye_corpus_lab",
+    "csj": r"D:\Data\speech\benchmark_datasets\csj\csj_lab",
+    "seoul_corpus": r"D:\Data\speech\benchmark_datasets\seoul_corpus\seoul_corpus_lab",
 }
 
 conditions = {
-    "mfa_3.1": (
+    "english": {
+    "arpa_1.0": (
+        os.path.join(mfa10_dir, "english.dict"),
+        os.path.join(mfa10_dir, "english.zip"),
+        "english_us_arpa",
+    ),
+        "mfa_3.1": (
         os.path.join(mfa31_dir, "english_us_mfa.dict"),
         os.path.join(mfa31_dir, "english_mfa.zip"),
+        "english_us_mfa",
     ),
-    "mfa_3.1_finetune": (
-        os.path.join(mfa31_dir, "english_us_mfa.dict"),
-        os.path.join(mfa31_dir, "english_mfa.zip"),
-    ),
-    "mfa_3.1_adapted": (
-        os.path.join(mfa31_dir, "english_us_mfa.dict"),
-        os.path.join(mfa31_dir, "english_mfa.zip"),
-    ),
-    "mfa_3.1_adapted_finetune": (
-        os.path.join(mfa31_dir, "english_us_mfa.dict"),
-        os.path.join(mfa31_dir, "english_mfa.zip"),
-    ),
-    "arpa_3.0": (
-        os.path.join(mfa30_dir, "english_us_arpa.dict"),
-        os.path.join(mfa30_dir, "english_us_arpa.zip"),
-    ),
-    "arpa_3.0_finetune": (
-        os.path.join(mfa30_dir, "english_us_arpa.dict"),
-        os.path.join(mfa30_dir, "english_us_arpa.zip"),
-    ),
-    "arpa_3.0_adapted": (
-        os.path.join(mfa30_dir, "english_us_arpa.dict"),
-        os.path.join(mfa30_dir, "english_us_arpa.zip"),
-    ),
-    "arpa_3.0_adapted_finetune": (
-        os.path.join(mfa30_dir, "english_us_arpa.dict"),
-        os.path.join(mfa30_dir, "english_us_arpa.zip"),
-    ),
+        "mfa_3.1_finetune": (
+            os.path.join(mfa31_dir, "english_us_mfa.dict"),
+            os.path.join(mfa31_dir, "english_mfa.zip"),
+        "english_us_mfa",
+        ),
+        "mfa_3.1_adapted": (
+            os.path.join(mfa31_dir, "english_us_mfa.dict"),
+            os.path.join(mfa31_dir, "english_mfa.zip"),
+        "english_us_mfa",
+        ),
+        "mfa_3.1_adapted_finetune": (
+            os.path.join(mfa31_dir, "english_us_mfa.dict"),
+            os.path.join(mfa31_dir, "english_mfa.zip"),
+        "english_us_mfa",
+        ),
+        "arpa_3.0": (
+            os.path.join(mfa30_dir, "english_us_arpa.dict"),
+            os.path.join(mfa30_dir, "english_us_arpa.zip"),
+        "english_us_arpa",
+        ),
+        "arpa_3.0_finetune": (
+            os.path.join(mfa30_dir, "english_us_arpa.dict"),
+            os.path.join(mfa30_dir, "english_us_arpa.zip"),
+        "english_us_arpa",
+        ),
+        "arpa_3.0_adapted": (
+            os.path.join(mfa30_dir, "english_us_arpa.dict"),
+            os.path.join(mfa30_dir, "english_us_arpa.zip"),
+        "english_us_arpa",
+        ),
+        "arpa_3.0_adapted_finetune": (
+            os.path.join(mfa30_dir, "english_us_arpa.dict"),
+            os.path.join(mfa30_dir, "english_us_arpa.zip"),
+        "english_us_arpa",
+        ), },
+    "csj": {
+        "mfa_3.1": (os.path.join(mfa30_dir, "japanese_mfa.dict"), os.path.join(mfa30_dir, "japanese_mfa.zip"), "japanese_mfa"),
+        "mfa_3.1_finetune": (os.path.join(mfa30_dir, "japanese_mfa.dict"), os.path.join(mfa30_dir, "japanese_mfa.zip"), "japanese_mfa"),
+        "mfa_3.1_adapted": (os.path.join(mfa30_dir, "japanese_mfa.dict"), os.path.join(mfa30_dir, "japanese_mfa.zip"), "japanese_mfa"),
+        "mfa_3.1_adapted_finetune": (os.path.join(mfa30_dir, "japanese_mfa.dict"), os.path.join(mfa30_dir, "japanese_mfa.zip"), "japanese_mfa"),
+    },
+    "seoul_corpus": {
+    'gp_1.0': (os.path.join(mfa10_dir, 'KO_dictionary.txt'), os.path.join(mfa10_dir, "korean.zip"), None),
+        "mfa_3.1": (os.path.join(mfa30_dir, "korean_mfa.dict"), os.path.join(mfa30_dir, "korean_mfa.zip"), os.path.join(mfa30_dir, "korean_jamo_mfa.zip")),
+        "mfa_3.1_finetune": (os.path.join(mfa30_dir, "korean_mfa.dict"), os.path.join(mfa30_dir, "korean_mfa.zip"), os.path.join(mfa30_dir, "korean_jamo_mfa.zip")),
+        "mfa_3.1_adapted": (os.path.join(mfa30_dir, "korean_mfa.dict"), os.path.join(mfa30_dir, "korean_mfa.zip"), os.path.join(mfa30_dir, "korean_jamo_mfa.zip")),
+        "mfa_3.1_adapted_finetune": (os.path.join(mfa30_dir, "korean_mfa.dict"), os.path.join(mfa30_dir, "korean_mfa.zip"), os.path.join(mfa30_dir, "korean_jamo_mfa.zip")),
+    }
 }
+mapping_files = {}
+for k in conditions.keys():
+    for corpus in corpus_directories:
+        if "arpa" in k:
+            phone_set = "arpa"
+        else:
+            phone_set = "mfa"
+        mapping_files[(k, corpus)] = os.path.join(
+            mapping_directory, f"{phone_set}_{corpus}_mapping.yaml"
+        )
 
 if __name__ == "__main__":
-    for condition, (dictionary_path, model_path) in conditions.items():
-        print(condition)
-        for corpus, root in corpus_directories.items():
+    for corpus, root in corpus_directories.items():
+        print(corpus)
+        key = corpus
+        if key not in conditions:
+            key = 'english'
+        for condition, (dictionary_path, model_path, g2p_path) in conditions[key].items():
             output_directory = os.path.join(root_dir, "alignments", corpus, condition)
             if os.path.exists(output_directory):
                 continue
@@ -68,10 +110,11 @@ if __name__ == "__main__":
                 continue
             if not os.path.exists(dictionary_path):
                 continue
+            print(condition)
             if "adapt" in condition:
                 os.makedirs(adapted_dir, exist_ok=True)
                 output_model_path = os.path.join(
-                    adapted_dir, f"{condition.replace('_finetune', '')}.zip"
+                    adapted_dir, corpus, condition, f"{condition.replace('_finetune', '')}.zip"
                 )
                 if not os.path.exists(output_model_path):
                     command = [
@@ -92,6 +135,11 @@ if __name__ == "__main__":
                         "--retry_beam",
                         "40",
                     ]
+                    if g2p_path:
+                        command += ["--g2p_model_path",
+                        g2p_path,]
+                    if "finetune" in condition:
+                        command += ["--fine_tune"]
                     print(command)
                     mfa_cli(command, standalone_mode=False)
                 model_path = output_model_path
@@ -113,6 +161,9 @@ if __name__ == "__main__":
                 "--retry_beam",
                 "40",
             ]
+            if g2p_path:
+                command += ["--g2p_model_path",
+                g2p_path,]
             if "finetune" in condition:
                 command += ["--fine_tune"]
             print(command)

@@ -31,6 +31,9 @@ if __name__ == "__main__":
                     text_path = text_path.replace(".txt", ".lab")
                 with open(text_path, encoding='utf8') as inf:
                     text = inf.read()
-                charsiu.serve(audio=os.path.join(speaker_directory, f),
-                              text=text,
-                              save_to=output_path)
+                try:
+                    charsiu.serve(audio=os.path.join(speaker_directory, f),
+                                  text=text,
+                                  save_to=output_path)
+                except Exception:
+                    pass

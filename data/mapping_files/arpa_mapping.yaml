@@ -1,0 +1,64 @@
+sil: ["[SIL]", "[SIL] sil", "[SIL] sil", "sil [SIL]"]
+"[SIL]": sil
+"sil [SIL]": sil
+"[SIL] sil": sil
+IY: [IY1, IY0, IY2]
+IY1: IY
+IY0: IY
+IY2: IY
+IH: [IH1, IH0, IH2]
+IH1: IH
+IH0: IH
+IH2: IH
+EY: [EY1, EY0, EY2]
+EY1: EY
+EY0: EY
+EY2: EY
+EH: [EH1, EH0, EH2]
+EH1: EH
+EH0: EH
+EH2: EH
+ER: [ER1, ER0, ER2]
+ER1: ER
+ER0: ER
+ER2: ER
+AY: [AY1, AY0, AY2]
+AY1: AY
+AY0: AY
+AY2: AY
+AW: [AW1, AW0, AW2]
+AW1: AW
+AW0: AW
+AW2: AW
+AA: [AA1, AA0, AA2]
+AA1: AA
+AA0: AA
+AA2: AA
+AE: [AE1, AE0, AE2]
+AE1: AE
+AE0: AE
+AE2: AE
+AO: [AO1, AO0, AO2]
+AO1: AO
+AO0: AO
+AO2: AO
+AH: [AH1, AH0, AH2]
+AH1: AH
+AH0: AH
+AH2: AH
+UH: [UH1, UH0, UH2]
+UH1: UH
+UH0: UH
+UH2: UH
+UW: [UW1, UW0, UW2]
+UW1: UW
+UW0: UW
+UW2: UW
+OW: [OW1, OW0, OW2]
+EW1: EW
+EW0: EW
+EW2: EW
+OY: [OY1, OY0, OY2]
+OY1: OY
+OY0: OY
+OY2: OY

@@ -1,0 +1,240 @@
+library(tidyr)
+library(dplyr)
+library(readr)
+library(stringr)
+root_dir = "D:/Data/experiments/interspeech_benchmarking/evaluation_data"
+
+data = data.frame()
+boundary_data = data.frame()
+
+corpora = list.dirs(root_dir, recursive = F, full.names = F)
+for (c in corpora){
+  evals = list.dirs(file.path(root_dir, c), recursive = F, full.names = F)
+  
+  for (e in evals){
+    
+    print(e)
+    path = file.path(root_dir, c, e, "alignment_reference_evaluation.csv")
+    if (!file.exists(path)){
+      next
+    }
+    print(path)
+    d = read_csv(path, show_col_types = F, lazy=F)
+    d$alignment_score <- as.numeric(d$alignment_score)
+    d$utterance <- paste(d$file, str_replace_all(as.character(d$begin), '\\.', '-'), str_replace_all(as.character(d$end), '\\.', '-'), sep="-")
+    d$evaluation = e
+    d$corpus = c
+    data = bind_rows(data,d)
+    
+    path = file.path(root_dir, c, e, "alignment_reference_evaluation_boundaries.csv")
+    if (!file.exists(path)){
+      next
+    }
+    print(path)
+    d = read_csv(path, show_col_types = F, lazy=F)
+    d$utterance <- paste(d$file, str_replace_all(as.character(d$utterance_begin), '\\.', '-'), str_replace_all(as.character(d$utterance_end), '\\.', '-'), sep="-")
+    d$evaluation = e
+    d$corpus = c
+    boundary_data = bind_rows(boundary_data,d)
+  }
+}
+
+data$evaluation = factor(data$evaluation)
+data$corpus = factor(data$corpus)
+boundary_data$evaluation = factor(boundary_data$evaluation)
+boundary_data$corpus = factor(boundary_data$corpus)
+boundary_data$abs_boundary_error = abs(boundary_data$boundary_error)
+
+# MFA models for comparison across aligners are the adapted, but might still be worth quantifying/showing effect of adaptation
+mfa3_data <- subset(data, evaluation %in% c("mfa_3.1", "mfa_3.1_adapted", "arpa_3.0", "arpa_3.0_adapted"))
+data <- subset(data, !evaluation %in% c("mfa_3.1", "arpa_3.0"))
+data[data$evaluation=="mfa_3.1_adapted",]$evaluation <- "mfa_3.1"
+data[data$evaluation=="arpa_3.0_adapted",]$evaluation <- "arpa_3.0"
+data$evaluation = factor(data$evaluation)
+
+mfa3_boundary_data <- subset(boundary_data, evaluation %in% c("mfa_3.1", "mfa_3.1_adapted", "arpa_3.0", "arpa_3.0_adapted"))
+boundary_data <- subset(boundary_data, !evaluation %in% c("mfa_3.1", "arpa_3.0"))
+boundary_data[boundary_data$evaluation=="mfa_3.1_adapted",]$evaluation <- "mfa_3.1"
+boundary_data[boundary_data$evaluation=="arpa_3.0_adapted",]$evaluation <- "arpa_3.0"
+boundary_data$evaluation = factor(boundary_data$evaluation)
+
+
+test_phone_lists = list(
+  maus=list(
+    vowel=c("U@", "@U", "u:", "OI", "O:", "o~", "I@", "i:", "eI", "e@", "e~", "aU", "aI", "A:", "a~", "3:", "3`", "V", "U", "u", "Q", "I", "E", "e", "6", "@", "{", 'o', "o:", 'a', 'i', 'a:', 'e:'),
+    stop=c("t", "k", "p", "g", "d", "b", "?", 'kk', 'k_j', 'k_jk_j', 'gg', 'g_j', 'b_j', 'p_j', 'p_jp_j', 'dd', 'tt', 'pp'),
+    approximant=c("l=", "w", "R", "r", "l", "j", "4", '4_j', 'jj'),
+    nasal=c("N=", "n=", "m=", "N", "n", "m", 'N\\', 'J', 'JJ', 'm_j'),
+    fricative=c("h\\", "v", "T", "h", "f", "D", "p\\", 'p\\_j', 'pp\\', 'hh', 'C'),
+    sibilant=c("Z", "z", "S", "s", 'ss', 'SS', "tS", "dZ", 'ts', 'tts', 'ttS', 'ddZ'),
+    silence=c('sil', '<p:>', '<p>')
+  ),
+  arpa=list(
+    vowel=c("AA", "AE", "AH", "AO", "AW", "AY", "EH", "ER", 'EY', "IH", "IY", "OW", "OY", "UH", "UW", "AA1", "AE1", "AH1", "AO1", "AW1", "AY1", "EH1", "ER1", 'EY1', "IH1", "IY1", "OW1", "OY1", "UH1", "UW1", "AA2", "AE2", "AH2", "AO2", "AW2", "AY2", "EH2", "ER2", 'EY2', "IH2", "IY2", "OW2", "OY2", "UH2", "UW2","AA0", "AE0", "AH0", "AO0", "AW0", "AY0", "EH0", "ER0", 'EY0', "IH0", "IY0", "OW0", "OY0", "UH0", "UW0"),
+    stop=c("B", "P", "D", "T", "G", "K"),
+    approximant=c("R", "L", "Y", "W"),
+    nasal=c("M", "N", "NG"),
+    fricative=c("DH", "TH", "HH", "F", "V"),
+    sibilant=c("S", "SH", "Z", "ZH", "CH", "JH"),
+    silence=c('sil')
+  ),
+  mfa=list(
+    vowel=c("a", "ɐ", "ɑ", "ɒ", "aː", "ɑː", "ɒː", "æ", "aj", "aw", "ɔj", "e", "ə", "ɚ", "eː", "ej", "ɛ", "ɝ", "ɛː", "ɥ i", "ɥ iː", "i", "ɪ", "ɨ", "i̥", "ɨ̥", "iː", "ɨː","j ɐ", "j e", "j eː", "j ɛː", "j o", "j oː", "j u", "j uː", "j ʌ", "j ʌː",  "ɯ", "ɯ̥","ɰ i", "ɰ iː", "ɯː", "o", "oː", "ow", "u", "ʉ", "ʊ", "uː", "ʉː", "ʌ", "ʌː",  "w ɐ", "w e", "w eː", "w ʌ", "w ʌː"),
+    stop=c("b", "bʲ", "c", "c͈","cː","cʰ","cʷ","d", "d̪","dː", "dʲ","ɡ", "ɡː", "ɡʷ", "ɟ", "ɟʷ", "k", "k̚", "k͈", "kː", "k͈ː", "kʰ", "kʷ", "k͈ʷ","p", "p̚", "p͈","pː","pʰ", "pʲ", "p͈ʲ","pʲː", "pʷ", "t", "t̚", "t̪", "t͈", "tː", "tʰ", "tʲ", "t��ʲ", "tʲː", "tʷ", "ʔ", "t͈ʲ"),
+    approximant=c("ɥ", "j", "l", "ɫ", "ɭ", "ɫ̩", "ɭː","ɰ",  "ɹ", "ɾ","ɾʲ", "w", "ʎ", "ʎː"),
+    nasal=c("m", "m̩","ɰ̃","mː", "mʲ", "mʲː", "n", "ɴ", "ɲ", "n̩", "nː", "ɴː", "ɲː", "ŋ","ɾ̃"),
+    fricative=c("ç", "ð", "f", "fʲ", "ɣ", "h", "ɦ", "ʝ", "ɸ", "ɸː", "ɸʲ", "ɸʷ","v","vʲ", "x",  "β", "βʷ", "θ"),
+    sibilant=c("ɕ", "ɕ͈","ɕː","s", "s͈", "ʃ", "sː", "sʰ", "sʷ","z", "ʑ", "ʒ", "ɕʰ", "dz", "dʑ", "dʑː", "dʒ", "tɕ", "tɕ͈", "tɕː", "tɕʰ", "tɕʷ", "tɕ͈ʷ","ts", "tʃ", "tsː"),
+    silence=c('sil')
+  ),
+  gp=list(
+    vowel=c("A", "AE", "E", "EO", "EU", "euI", "I", "iA", "iE", "iEO", "iO", "iU", "O", "oA", "OE", "U", "UE", "uEO"),
+    stop=c("B", "BB", "D", "DD", "G", "GG", "k", "Kh", "p", "Ph", "t", "Th"),
+    approximant=c("L", "R"),
+    nasal=c("M", "N", "NG"),
+    fricative=c("H"),
+    sibilant=c("CHh", "J", "JJ", "S", "SS"),
+    silence=c('sil')
+  ),
+  bournemouth=list(
+    vowel=c("a", "a:", "æ", "aɪ", "aʊ", "ɔ", "ɔɪ", "e", "ə", "ɚ", "eɪ", "ɛ", "i", "ɪ", "i:", "j e", "j ɛ", "j o", "j u", "j ʌ", "ɯ", "o", "o:", "oʊ", "u", "ʊ", "u:", "ʌ", "w e", "w ɛ", "w i", "w ʌ"),
+    stop=c("b", "d", "g", "k", "p", "q", "t"),
+    approximant=c("j", "l", "ɹ", "ɾ", "w"),
+    nasal=c("m", "n", "ŋ"),
+    fricative=c("ç", "ð", "f", "h", "v", "θ"),
+    sibilant=c("ɕ", "s", "ʃ", "z", "ʒ", "dʒ", "ts", "tʃ"),
+    silence=c('sil')
+  ),
+  charsiu=list(
+    vowel=c("AA", "AE", "AH", "AO", "AW", "AY", "EH", "ER", 'EY', "IH", "IY", "OW", "OY", "UH", "UW", "AA1", "AE1", "AH1", "AO1", "AW1", "AY1", "EH1", "ER1", 'EY1', "IH1", "IY1", "OW1", "OY1", "UH1", "UW1", "AA2", "AE2", "AH2", "AO2", "AW2", "AY2", "EH2", "ER2", 'EY2', "IH2", "IY2", "OW2", "OY2", "UH2", "UW2","AA0", "AE0", "AH0", "AO0", "AW0", "AY0", "EH0", "ER0", 'EY0', "IH0", "IY0", "OW0", "OY0", "UH0", "UW0"),
+    stop=c("B", "P", "D", "T", "G", "K"),
+    approximant=c("R", "L", "Y", "W"),
+    nasal=c("M", "N", "NG"),
+    fricative=c("DH", "TH", "HH", "F", "V"),
+    sibilant=c("S", "SH", "Z", "ZH", "CH", "JH"),
+    silence=c('sil', "[SIL]", "sil [SIL]", '[SIL] sil')
+  ),
+  maps=list(
+    vowel=c("AA", "AE", "AH", "AO", "AW", "AY", "EH", "ER", 'EY', "IH", "IY", "OW", "OY", "UH", "UW", "AA1", "AE1", "AH1", "AO1", "AW1", "AY1", "EH1", "ER1", 'EY1', "IH1", "IY1", "OW1", "OY1", "UH1", "UW1", "AA2", "AE2", "AH2", "AO2", "AW2", "AY2", "EH2", "ER2", 'EY2', "IH2", "IY2", "OW2", "OY2", "UH2", "UW2","AA0", "AE0", "AH0", "AO0", "AW0", "AY0", "EH0", "ER0", 'EY0', "IH0", "IY0", "OW0", "OY0", "UH0", "UW0"),
+    stop=c("B", "P", "D", "T", "G", "K"),
+    approximant=c("R", "L", "Y", "W"),
+    nasal=c("M", "N", "NG"),
+    fricative=c("DH", "TH", "HH", "F", "V"),
+    sibilant=c("S", "SH", "Z", "ZH", "CH", "JH"),
+    silence=c('sil', 'H#')
+  ),
+  sppas=list(
+    vowel=c('@', "@U", "{", "3:r", 'a', 'A', 'a:', 'aI', 'aU', 'e', 'E','e:', 'eI', 'i', 'I', 'i:', 'o', 'o:','O:', 'OI', 'u', 'U', 'u:', 'V'),
+    stop=c("b", 'by', 'd', 'g', 'gy', 'k', 'ky', 'q', 'p', 'py', 't'),
+    approximant=c("4", 'l', 'r', 'r\\', 'ry', 'w', 'y'),
+    nasal=c('m', 'n', 'my', 'N', 'ny'),
+    fricative=c('D', 'T', 'f', 'h', 'hy', 'v'),
+    sibilant=c('j', 's', 'sh', 'S', 'z', 'Z', 'ch', 'dZ', 'ts','tS'),
+    silence=c('sil', 'silE', 'silB', 'sp')
+  ),
+  julius=list(
+    vowel=c("a", "a:", "e", "e:", "i", "i:", "o", "o:", "u", "u:"),
+    stop=c("b", "by", "d", "dy", "g", "gy", "k", "ky", "p", "py", "q", "t"),
+    approximant=c("r", "ry", "w", "y"),
+    nasal=c("m", "my", "n", "N", "ny"),
+    fricative=c("f", "h", "hy"),
+    sibilant=c("s", "sh", "z", "ch", "ts", "j"),
+    silence=c('sil', 'silB', 'silE', 'sp')
+  ),
+  koreanforcedaligner=list(
+    vowel=c("a", "ae", "e", "eo", "eu", "i", "o", "oe", "u", "wa", "wae", "we", "weo", "wi", "ya", "yae", "ye", "yeo", "yi", "yo", "yu"),
+    stop=c("b", "bb", "d", "dd", "g", "gg", "k", "p", "t"),
+    approximant=c("l", "r"),
+    nasal=c("m", "n", "ng"),
+    fricative=c("h"),
+    sibilant=c("s", "ss", "c", "j", "jj"),
+    silence=c('sil')
+  )
+)
+
+
+boundary_data$previous_test_category <- "unknown"
+boundary_data$following_test_category <- "unknown"
+
+for (n in names(test_phone_lists)) {
+  for (category in names(test_phone_lists[[n]])){
+    boundary_data[boundary_data$previous_test_phone %in% test_phone_lists[[n]][[category]] & str_detect(boundary_data$evaluation, n),]$previous_test_category = category
+    boundary_data[boundary_data$following_test_phone %in% test_phone_lists[[n]][[category]] & str_detect(boundary_data$evaluation, n),]$following_test_category = category
+  }
+}
+
+reference_phone_lists = list(
+  timit=list(
+    vowel=c('aa', 'aan', 'ao', 'aon', 'ae', 'aen', 'ah', 'ahn', 'aw', 'awn', 'ay', 'ayn', 'eh', 'ehn', 'er', 'ern', 'ey', 'eyn', 'ih', 'ihn', 'iy', 'iyn', 'ow', 'own', 'oy', 'oyn', 'uw', 'uwn', 'uh', 'uhn', 'ax', 'ax-h', 'ix', 'ux', 'axr', 'ih r', 'iy r'),
+    stop=c('b', 'p', 't', 'd', 'k', 'g', 'q', 'bcl', 'pcl', 'tcl', 'tcl q', 'dcl', 'kcl', 'gcl', 't w', 'g w', 'k w', 'd w', 'p w', 'b w'),
+    approximant=c('el', 'l', 'r', 'dx', 'y', 'w'),
+    nasal=c("en", "n","nx","em", 'm', 'eng', 'ng'),
+    fricative=c('th', 'dh', 'f', 'v', 'hh', 'hv'),
+    sibilant=c('s', 'z', 'sh', 'zh', 'ch', 'jh'),
+    silence=c('sil')
+  ),
+  buckeye=list(
+    vowel=c('aa', 'aan', 'ao', 'aon', 'ae', 'aen', 'ah', 'ahn', 'aw', 'awn', 'ay', 'ayn', 'eh', 'ehn', 'er', 'ern', 'ey', 'eyn', 'ih', 'ihn', 'iy', 'iyn', 'ow', 'own', 'oy', 'oyn', 'uw', 'uwn', 'uh', 'uhn', 'ih r', 'iy r'),
+    stop=c('b', 'p', 't', 'd', 'k', 'g', 'tq'),
+    approximant=c('el', 'l', 'r', 'dx', 'y', 'w'),
+    nasal=c("en", "n","nx","em", 'm', 'eng', 'ng'),
+    fricative=c('th', 'dh', 'f', 'v', 'hh'),
+    sibilant=c('s', 'z', 'sh', 'zh', 'ch', 'jh'),
+    silence=c('sil')
+  ),
+  seoul_corpus=list(
+    vowel=c('aa', 'ee', 'ii', 'oo', 'uu', 'vv', 'wa', 'we', 'wi', 'wv', 'xi', 'xx', 'ya', 'ye', 'yo', 'yu', 'yv'),
+    stop=c('k0', 'kh', 'kk', 'p0', 'ph', 'pp', 't0', 'th', 'tt'),
+    approximant=c('ll', 'll ll'),
+    nasal=c('mm', 'mm mm', 'ng', 'nn', 'nn nn'),
+    fricative=c('hh'),
+    sibilant=c('s0', 'ss', 'c0', 'cc', 'ch'),
+    silence=c('sil')
+  ),
+  csj=list(
+    vowel=c('o', 'o H', 'a', 'a H', 'e', 'e H', 'i', 'i H', 'u', 'u H', 'H'),
+    stop=c('b', 'by', 'bj', 'd', 'dy', 'dj', 'g', 'gy', 'gj', 'k', 'ky', 'kj', 'kw', 'p', 'py', 'Q', 'Q d', 'Q g', 'Q k','Q kj', 'Q ky', 'Q p', 'Q py', 'Q t', 't', 'ty', 'tj'),
+    approximant=c('r', 'ry', 'w', 'y'),
+    nasal=c('m', 'n','my', 'N', 'N m', 'N my', 'N N', 'N n', 'N nj', 'N ny', 'nj', 'ny'),
+    fricative=c('F', 'Fy', 'h', 'hy', 'Q F', 'v', 'hj'),
+    sibilant=c('Q s', 'Q sj', 'Q sy', 'Q zj', 's', 'sj', 'sy', 'z', 'zj', 'zy', 'c', 'cj', 'cy', 'Q c', 'Q cj', 'Q cy'),
+    silence=c('sil')
+  )
+)
+
+
+
+boundary_data$previous_reference_category <- "unknown"
+boundary_data$following_reference_category <- "unknown"
+
+for (n in names(reference_phone_lists)) {
+  for (category in names(reference_phone_lists[[n]])){
+    boundary_data[boundary_data$previous_reference_phone %in% reference_phone_lists[[n]][[category]] & boundary_data$corpus == n,]$previous_reference_category = category
+    boundary_data[boundary_data$following_reference_phone %in% reference_phone_lists[[n]][[category]] & boundary_data$corpus == n,]$following_reference_category = category
+  }
+}
+
+
+for (cor in levels(boundary_data$corpus)){
+  print(cor)
+  for (c in levels(boundary_data$previous_reference_category)){
+    t <- subset(boundary_data, previous_reference_category == c)
+    phones = sort(unique(t$previous_reference_phone))
+    print(c)
+    print(phones)
+    t <- subset(boundary_data, following_reference_category == c)
+    phones = sort(unique(t$following_reference_phone))
+    print(phones)
+  }
+}
+
+data %>% subset(is.na(alignment_score)) %>% group_by(corpus, evaluation) %>% summarise(unaligned_count=n())
+
+unaligned_utterances = unique(subset(data, is.na(alignment_score))$utterance)
+
+filtered_data <- subset(data, !utterance %in% unaligned_utterances)
+
+threshold_table = boundary_data %>% mutate(thresh_20ms=abs_boundary_error *1000 <= 20, thresh_50ms=abs_boundary_error *1000 <= 50) %>% group_by(corpus, evaluation) %>% summarise(thresh_20ms=mean(thresh_20ms), thresh_50ms=mean(thresh_50ms)) 
+
+filtered_boundary_data = boundary_data %>% subset(previous_reference_category == previous_test_category & following_reference_category == following_test_category & following_test_category != 'unknown' & following_reference_category != 'unknown' & previous_test_category != "unknown" & previous_reference_category != "unknown" & !utterance %in% unaligned_utterances)
+threshold_table_filtered = filtered_boundary_data %>% mutate(thresh_20ms=abs_boundary_error *1000 <= 20, thresh_50ms=abs_boundary_error *1000 <= 50) %>% group_by(corpus, evaluation) %>% summarise(thresh_20ms=mean(thresh_20ms), thresh_50ms=mean(thresh_50ms)) 
