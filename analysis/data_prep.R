@@ -1,7 +1,4 @@
-library(tidyr)
-library(dplyr)
-library(readr)
-library(stringr)
+
 root_dir = "D:/Data/experiments/interspeech_benchmarking/evaluation_data"
 
 data = data.frame()
@@ -52,7 +49,7 @@ data[data$evaluation=="mfa_3.1_adapted",]$evaluation <- "mfa_3.1"
 data[data$evaluation=="arpa_3.0_adapted",]$evaluation <- "arpa_3.0"
 data$evaluation = factor(data$evaluation)
 
-mfa3_boundary_data <- subset(boundary_data, evaluation %in% c("mfa_3.1", "mfa_3.1_adapted", "arpa_3.0", "arpa_3.0_adapted"))
+mfa3_boundary_data <- subset(boundary_data, evaluation %in% c("arpa_1.0", "mfa_3.1", "mfa_3.1_adapted", "arpa_3.0", "arpa_3.0_adapted"))
 boundary_data <- subset(boundary_data, !evaluation %in% c("mfa_3.1", "arpa_3.0"))
 boundary_data[boundary_data$evaluation=="mfa_3.1_adapted",]$evaluation <- "mfa_3.1"
 boundary_data[boundary_data$evaluation=="arpa_3.0_adapted",]$evaluation <- "arpa_3.0"
@@ -162,12 +159,14 @@ for (n in names(test_phone_lists)) {
     boundary_data[boundary_data$following_test_phone %in% test_phone_lists[[n]][[category]] & str_detect(boundary_data$evaluation, n),]$following_test_category = category
   }
 }
+boundary_data[boundary_data$previous_test_phone %in% c( "ɾ","ɾʲ", "4") & boundary_data$corpus %in% c('timit', 'buckeye'),]$previous_test_category = 'stop'
+boundary_data[boundary_data$following_test_phone %in% c( "ɾ","ɾʲ", "4") & boundary_data$corpus %in% c('timit', 'buckeye'),]$following_test_category = 'stop'
 
 reference_phone_lists = list(
   timit=list(
     vowel=c('aa', 'aan', 'ao', 'aon', 'ae', 'aen', 'ah', 'ahn', 'aw', 'awn', 'ay', 'ayn', 'eh', 'ehn', 'er', 'ern', 'ey', 'eyn', 'ih', 'ihn', 'iy', 'iyn', 'ow', 'own', 'oy', 'oyn', 'uw', 'uwn', 'uh', 'uhn', 'ax', 'ax-h', 'ix', 'ux', 'axr', 'ih r', 'iy r'),
-    stop=c('b', 'p', 't', 'd', 'k', 'g', 'q', 'bcl', 'pcl', 'tcl', 'tcl q', 'dcl', 'kcl', 'gcl', 't w', 'g w', 'k w', 'd w', 'p w', 'b w'),
-    approximant=c('el', 'l', 'r', 'dx', 'y', 'w'),
+    stop=c('dx', 'b', 'p', 't', 'd', 'k', 'g', 'q', 'bcl', 'pcl', 'tcl', 'tcl q', 'dcl', 'kcl', 'gcl', 't w', 'g w', 'k w', 'd w', 'p w', 'b w'),
+    approximant=c('el', 'l', 'r', 'y', 'w'),
     nasal=c("en", "n","nx","em", 'm', 'eng', 'ng'),
     fricative=c('th', 'dh', 'f', 'v', 'hh', 'hv'),
     sibilant=c('s', 'z', 'sh', 'zh', 'ch', 'jh'),
@@ -175,8 +174,8 @@ reference_phone_lists = list(
   ),
   buckeye=list(
     vowel=c('aa', 'aan', 'ao', 'aon', 'ae', 'aen', 'ah', 'ahn', 'aw', 'awn', 'ay', 'ayn', 'eh', 'ehn', 'er', 'ern', 'ey', 'eyn', 'ih', 'ihn', 'iy', 'iyn', 'ow', 'own', 'oy', 'oyn', 'uw', 'uwn', 'uh', 'uhn', 'ih r', 'iy r'),
-    stop=c('b', 'p', 't', 'd', 'k', 'g', 'tq'),
-    approximant=c('el', 'l', 'r', 'dx', 'y', 'w'),
+    stop=c('b', 'p', 't', 'd', 'k', 'g', 'dx', 'tq'),
+    approximant=c('el', 'l', 'r', 'y', 'w'),
     nasal=c("en", "n","nx","em", 'm', 'eng', 'ng'),
     fricative=c('th', 'dh', 'f', 'v', 'hh'),
     sibilant=c('s', 'z', 'sh', 'zh', 'ch', 'jh'),
@@ -201,7 +200,9 @@ reference_phone_lists = list(
     silence=c('sil')
   )
 )
+boundary_data[boundary_data$previous_test_phone %in% c( "ER0", "ER1", 'ER2', 'R', "3:", "3`", "3:r","r\\") & boundary_data$previous_reference_phone %in% c( "axr","r", "er")& boundary_data$corpus %in% c('timit', 'buckeye'),]$previous_test_category = boundary_data[boundary_data$previous_test_phone %in% c( "ER0", "ER1", 'ER2', 'R', "3:", "3`", "3:r","r\\") & boundary_data$previous_reference_phone %in% c( "axr","r", "er")& boundary_data$corpus %in% c('timit', 'buckeye'),]$previous_reference_category
 
+boundary_data[boundary_data$following_test_phone %in% c( "ER0", "ER1", 'ER2', 'R', "3:", "3`", "3:r","r\\") & boundary_data$following_reference_phone %in% c( "axr","r", "er")& boundary_data$corpus %in% c('timit', 'buckeye'),]$following_test_category = boundary_data[boundary_data$following_test_phone %in% c( "ER0", "ER1", 'ER2', 'R', "3:", "3`", "3:r","r\\") & boundary_data$following_reference_phone %in% c( "axr","r", "er")& boundary_data$corpus %in% c('timit', 'buckeye'),]$following_reference_category
 
 
 boundary_data$previous_reference_category <- "unknown"
@@ -229,12 +230,31 @@ for (cor in levels(boundary_data$corpus)){
 }
 
 data %>% subset(is.na(alignment_score)) %>% group_by(corpus, evaluation) %>% summarise(unaligned_count=n())
+View(data %>% group_by(corpus, evaluation) %>% summarise(unaligned_count=sum(is.na(alignment_score)),total=n()))
+View(filtered_data %>% group_by(corpus, evaluation) %>% summarise(unaligned_count=sum(is.na(alignment_score)),total=n()))
 
-unaligned_utterances = unique(subset(data, is.na(alignment_score))$utterance)
+unaligned_utterances = unique(subset(data, is.na(alignment_score) & evaluation != 'sppas')$utterance)
+
+utterances_with_unknown = unique(subset(boundary_data, following_test_category == 'unknown' | previous_test_category == 'unknown')$utterance)
+boundary_data %>% subset(following_test_category == 'unknown' | previous_test_category == 'unknown') %>%group_by(corpus, evaluation) %>% summarise(n_distinct(utterance))
 
 filtered_data <- subset(data, !utterance %in% unaligned_utterances)
+data %>% group_by(corpus, evaluation) %>% summarise(phone_count=sum(reference_phone_count), removed_utterances=sum(utterance %in% unaligned_utterances), unknown_utterances=sum(utterance %in% utterances_with_unknown),total=n())
 
 threshold_table = boundary_data %>% mutate(thresh_20ms=abs_boundary_error *1000 <= 20, thresh_50ms=abs_boundary_error *1000 <= 50) %>% group_by(corpus, evaluation) %>% summarise(thresh_20ms=mean(thresh_20ms), thresh_50ms=mean(thresh_50ms)) 
 
-filtered_boundary_data = boundary_data %>% subset(previous_reference_category == previous_test_category & following_reference_category == following_test_category & following_test_category != 'unknown' & following_reference_category != 'unknown' & previous_test_category != "unknown" & previous_reference_category != "unknown" & !utterance %in% unaligned_utterances)
-threshold_table_filtered = filtered_boundary_data %>% mutate(thresh_20ms=abs_boundary_error *1000 <= 20, thresh_50ms=abs_boundary_error *1000 <= 50) %>% group_by(corpus, evaluation) %>% summarise(thresh_20ms=mean(thresh_20ms), thresh_50ms=mean(thresh_50ms)) 
+filtered_boundary_data = boundary_data %>% subset(previous_reference_category == previous_test_category & following_reference_category == following_test_category & following_test_category != 'unknown' & following_reference_category != 'unknown' & previous_test_category != "unknown" & previous_reference_category != "unknown")
+threshold_table_filtered = filtered_boundary_data %>% mutate(thresh_10ms=abs_boundary_error *1000 <= 10, thresh_20ms=abs_boundary_error *1000 <= 20, thresh_50ms=abs_boundary_error *1000 <= 50, thresh_100ms=abs_boundary_error *1000 <= 100) %>% group_by(corpus, evaluation) %>% summarise(mean_error=round(mean(abs_boundary_error *1000),2), thresh_10ms=round(mean(thresh_10ms) *100,2), thresh_20ms=round(mean(thresh_20ms) *100,2), thresh_50ms=round(mean(thresh_50ms) *100,2), thresh_100ms=round(mean(thresh_100ms) *100,2), n()) 
+
+t = boundary_data %>% mutate(mismatch_categories=previous_reference_category != previous_test_category & following_reference_category != following_test_category & following_test_category != 'unknown' & following_reference_category != 'unknown' & previous_test_category != "unknown" & previous_reference_category != "unknown" & !utterance %in% unaligned_utterances, unknown_categories = following_test_category == 'unknown' | following_reference_category == 'unknown' | previous_test_category == "unknown" | previous_reference_category == "unknown") %>% group_by(corpus, evaluation) %>% summarise(mismatched=sum(mismatch_categories), unknown=sum(unknown_categories),total =n()) %>% mutate(mismatch_percent=mismatched/total * 100)
+
+View(subset(boundary_data, evaluation == 'sppas'& corpus == 'buckeye' & previous_test_category == 'unknown'))
+View(subset(boundary_data, evaluation == 'maus'& corpus == 'csj' & previous_test_category == 'unknown'))
+
+
+View(subset(boundary_data, evaluation == 'maps' & previous_reference_category != previous_test_category & corpus == 'timit'))
+
+View(filtered_data %>% subset(!is.na(alignment_score)) %>% group_by(corpus, evaluation) %>% summarise(mean_phone_error_rate= round(mean(phone_error_rate) *100,2), mean_alignment_score= round(mean(alignment_score) *1000,2)))
+
+
+head(filtered_data %>% subset(!is.na(alignment_score) & evaluation == 'maps' & corpus == 'timit') %>% arrange(desc(phone_error_rate)))

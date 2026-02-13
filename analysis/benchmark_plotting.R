@@ -26,7 +26,7 @@ plotData <- summarySE(data=filtered_boundary_data, measurevar = 'abs_boundary_er
 
 ggplot(aes(x=evaluation, y=mean * 1000), data=plotData) + geom_point(size = 5, color='#FB5607') +
   geom_errorbar(aes(ymin = (mean - ci) * 1000, ymax = (mean + ci)* 1000),size=2, width=0.5, color='#FB5607') +
-  ylab('Phone boundary error (ms)') + xlab('Data subset') +ggtitle('Phone boundary errors') +
+  ylab('Phone boundary error (ms)') + xlab('Aligner') +ggtitle('Phone boundary errors') +
   theme_memcauliffe() +
   scale_x_discrete(guide = guide_axis(n.dodge = 2))+ facet_wrap(~corpus, scales='free_x') #+ scale_color_manual(values=cbbPalette) 
 

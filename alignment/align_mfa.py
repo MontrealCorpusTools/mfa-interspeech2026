@@ -18,9 +18,9 @@ mapping_directory = os.path.join(
 )
 
 corpus_directories = {
-    "timit": r"D:\Data\speech\benchmark_datasets\timit\timit_benchmark",
-    "buckeye": r"D:\Data\speech\benchmark_datasets\buckeye\buckeye_corpus_lab",
-    "csj": r"D:\Data\speech\benchmark_datasets\csj\csj_lab",
+    #"timit": r"D:\Data\speech\benchmark_datasets\timit\timit_benchmark",
+    #"buckeye": r"D:\Data\speech\benchmark_datasets\buckeye\buckeye_corpus_lab",
+    #"csj": r"D:\Data\speech\benchmark_datasets\csj\csj_lab",
     "seoul_corpus": r"D:\Data\speech\benchmark_datasets\seoul_corpus\seoul_corpus_lab",
 }
 
@@ -78,11 +78,11 @@ conditions = {
         "mfa_3.1_adapted_finetune": (os.path.join(mfa30_dir, "japanese_mfa.dict"), os.path.join(mfa30_dir, "japanese_mfa.zip"), "japanese_mfa"),
     },
     "seoul_corpus": {
-    'gp_1.0': (os.path.join(mfa10_dir, 'KO_dictionary.txt'), os.path.join(mfa10_dir, "korean.zip"), None),
+    'gp_1.0': (os.path.join(mfa10_dir, 'KO_dictionary.txt'), os.path.join(mfa10_dir, "korean.zip"), os.path.join(mfa10_dir, "korean_gp.zip")),
         "mfa_3.1": (os.path.join(mfa30_dir, "korean_mfa.dict"), os.path.join(mfa30_dir, "korean_mfa.zip"), os.path.join(mfa30_dir, "korean_jamo_mfa.zip")),
-        "mfa_3.1_finetune": (os.path.join(mfa30_dir, "korean_mfa.dict"), os.path.join(mfa30_dir, "korean_mfa.zip"), os.path.join(mfa30_dir, "korean_jamo_mfa.zip")),
+        #"mfa_3.1_finetune": (os.path.join(mfa30_dir, "korean_mfa.dict"), os.path.join(mfa30_dir, "korean_mfa.zip"), os.path.join(mfa30_dir, "korean_jamo_mfa.zip")),
         "mfa_3.1_adapted": (os.path.join(mfa30_dir, "korean_mfa.dict"), os.path.join(mfa30_dir, "korean_mfa.zip"), os.path.join(mfa30_dir, "korean_jamo_mfa.zip")),
-        "mfa_3.1_adapted_finetune": (os.path.join(mfa30_dir, "korean_mfa.dict"), os.path.join(mfa30_dir, "korean_mfa.zip"), os.path.join(mfa30_dir, "korean_jamo_mfa.zip")),
+        #"mfa_3.1_adapted_finetune": (os.path.join(mfa30_dir, "korean_mfa.dict"), os.path.join(mfa30_dir, "korean_mfa.zip"), os.path.join(mfa30_dir, "korean_jamo_mfa.zip")),
     }
 }
 mapping_files = {}
@@ -103,6 +103,23 @@ if __name__ == "__main__":
         if key not in conditions:
             key = 'english'
         for condition, (dictionary_path, model_path, g2p_path) in conditions[key].items():
+            if not os.path.exists(g2p_path):
+                command = [
+                    "train_g2p",
+                    str(dictionary_path),
+                    str(g2p_path),
+                    "-j",
+                    "10",
+                    "--clean",
+                    "--no_debug",
+                    "--use_mp",
+                    "--phonetisaurus",
+                    "--unicode_decomposition",
+                    "True"
+                ]
+                print(command)
+                mfa_cli(command, standalone_mode=False)
+
             output_directory = os.path.join(root_dir, "alignments", corpus, condition)
             if os.path.exists(output_directory):
                 continue
@@ -164,6 +181,8 @@ if __name__ == "__main__":
             if g2p_path:
                 command += ["--g2p_model_path",
                 g2p_path,]
+            if condition == 'gp_1.0':
+                command += ["--language", "korean"]
             if "finetune" in condition:
                 command += ["--fine_tune"]
             print(command)

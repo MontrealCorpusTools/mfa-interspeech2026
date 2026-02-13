@@ -45,3 +45,6 @@ ggplot(aes(x=following_reference_category, y=previous_reference_category, fill=m
   scale_x_discrete(guide = guide_axis(n.dodge = 2)) +ggtitle(paste("Mean boundary error for", ds, sep=" ")) +facet_wrap(~mfa_model)
 
 ggsave(paste("output/", ds, "_phone_category_agreement.png", sep=""), width=2000, height=800, units="px", dpi=200)
+
+
+mfa3_boundary_data %>% mutate(thresh_10ms=abs_boundary_error *1000 <= 10, thresh_20ms=abs_boundary_error *1000 <= 20, thresh_50ms=abs_boundary_error *1000 <= 50, thresh_100ms=abs_boundary_error *1000 <= 100) %>% group_by(corpus, evaluation) %>% summarise(mean_error=round(mean(abs_boundary_error *1000),2), thresh_10ms=round(mean(thresh_10ms) *100,2), thresh_20ms=round(mean(thresh_20ms) *100,2), thresh_50ms=round(mean(thresh_50ms) *100,2), thresh_100ms=round(mean(thresh_100ms) *100,2), n()) 
