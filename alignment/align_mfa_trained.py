@@ -45,6 +45,12 @@ conditions = {
             "g2p_path": "english_us_mfa",
             "phone_groups_path": os.path.join(phone_groups_directory, "english_mfa.yaml"),
         },
+        "mfa_trained_no_pronunciation_probability": {
+            "dictionary_path": os.path.join(mfa_models_training_path, "english_us_mfa.dict"),
+            "g2p_path": "english_us_mfa",
+            "phone_groups_path": os.path.join(phone_groups_directory, "english_mfa.yaml"),
+            "config_path": os.path.join(config_directory, "no_pronunciation_probability.yaml"),
+        },
         "mfa_trained_rules": {
             "dictionary_path": os.path.join(mfa_models_training_path, "english_us_mfa.dict"),
             "g2p_path": "english_us_mfa",
@@ -61,6 +67,11 @@ conditions = {
             "g2p_path": "english_us_arpa",
             "phone_groups_path": os.path.join(phone_groups_directory, "english_arpa.yaml"),
             "rules_path": os.path.join(rules_directory, "english_arpa.yaml"),
+        },
+        "arpa_trained_no_pronunciation_probability": {
+            "dictionary_path": os.path.join(mfa_models_training_path, "english_us_arpa.dict"),
+            "g2p_path": "english_us_arpa",
+            "phone_groups_path": os.path.join(phone_groups_directory, "english_arpa.yaml"),
         },
     },
     "buckeye": {
@@ -124,20 +135,20 @@ conditions = {
     "seoul_corpus": {
         "mfa_trained": {
             "dictionary_path": os.path.join(mfa_models_training_path, "korean_mfa.dict"),
-            "g2p_path": os.path.join(mfa30_dir, "korean_jamo_mfa.zip"),
+            "g2p_path": os.path.join(mfa30_dir, "g2p", "korean_mfa.zip"),
             "phone_groups_path": os.path.join(phone_groups_directory, "korean_mfa.yaml"),
             "language": "korean",
         },
         "mfa_trained_no_pronunciation_probability": {
             "dictionary_path": os.path.join(mfa_models_training_path, "korean_mfa.dict"),
-            "g2p_path": os.path.join(mfa30_dir, "korean_jamo_mfa.zip"),
+            "g2p_path": os.path.join(mfa30_dir, "g2p", "korean_mfa.zip"),
             "phone_groups_path": os.path.join(phone_groups_directory, "korean_mfa.yaml"),
             "language": "korean",
             "config_path": os.path.join(config_directory, "no_pronunciation_probability.yaml"),
         },
         "mfa_trained_rules": {
             "dictionary_path": os.path.join(mfa_models_training_path, "korean_mfa.dict"),
-            "g2p_path": os.path.join(mfa30_dir, "korean_jamo_mfa.zip"),
+            "g2p_path": os.path.join(mfa30_dir, "g2p", "korean_mfa.zip"),
             "phone_groups_path": os.path.join(phone_groups_directory, "korean_mfa.yaml"),
             "rules_path": os.path.join(rules_directory, "korean_mfa.yaml"),
             "language": "korean",
@@ -157,7 +168,8 @@ if __name__ == "__main__":
             rules_path = data.get("rules_path", None)
             config_path = data.get("config_path", None)
             language = data.get("language", None)
-            trained_model_path = os.path.join(trained_directory, f"{corpus}_{condition}.zip")
+            trained_model_path = os.path.join(trained_directory, corpus, condition, f"{lang}.zip")
+            trained_dictionary_path = os.path.join(trained_directory, corpus, condition, dictionary_path.split("\\")[-1])
             if not os.path.exists(trained_model_path):
                 command = [
                     "train",
@@ -199,10 +211,12 @@ if __name__ == "__main__":
             if os.path.exists(output_directory):
                 continue
             print(condition)
+            if not os.path.exists(trained_dictionary_path):
+                trained_dictionary_path = dictionary_path
             command = [
                 "align",
                 root,
-                dictionary_path,
+                trained_dictionary_path,
                 trained_model_path,
                 output_directory,
                 "-j",

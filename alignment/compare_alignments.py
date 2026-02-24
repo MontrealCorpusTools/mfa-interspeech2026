@@ -141,6 +141,8 @@ if __name__ == "__main__":
                 phone_set = 'gp'
             else:
                 phone_set = condition
+            if "remapped" in condition:
+                phone_set = "english_mfa"
             mapping_file = os.path.join(
                 mapping_directory, f"{phone_set}_{corpus}_mapping.yaml"
             )

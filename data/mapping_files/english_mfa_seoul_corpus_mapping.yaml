@@ -22,9 +22,11 @@ tʷ: [t0, th, tt]
 tʲ: [t0, th, tt]
 tʰ: th
 s: [s0, ss]
+z: [ss]
 "s w": [s0, ss]
 "s h": [s0, ss]
 ʃ: [s0, ss]
+ʒ: [ss]
 "ʃ w": [s0, ss]
 "ʃ h": [s0, ss]
 dʒ: [c0, t0, cc]
@@ -44,6 +46,7 @@ n: [nn, ng, "nn nn"]
 ɲ: [nn, ng]
 ɭ: [ll, 'll ll']
 ʎ: [ll, 'll ll']
+l: ll
 ɾ: ll
 ɾʲ: ll
 ɾʷ: ll
@@ -82,8 +85,8 @@ j ɑː: yv
 w ɐ: wa
 w ɑ: wv
 w ɑː: wv
-w i: wi
-w iː: wi
+w i: [wi, xi]
+w iː: [wi, xi]
 w e: we
 w ɛ: we
 w eː: we

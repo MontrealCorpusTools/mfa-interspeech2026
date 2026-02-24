@@ -24,15 +24,15 @@ root_dir = r"D:\Data\experiments\interspeech_benchmarking\word_alignments"
 corpus_directories = {
     "timit": r"D:\Data\speech\benchmark_datasets\timit\timit_benchmark",
     "buckeye": r"D:\Data\speech\benchmark_datasets\buckeye\buckeye_corpus_lab",
-    "csj": r"D:\Data\speech\benchmark_datasets\csj\csj_lab",
-    "seoul_corpus": r"D:\Data\speech\benchmark_datasets\seoul_corpus\seoul_corpus_lab",
+    #"csj": r"D:\Data\speech\benchmark_datasets\csj\csj_lab",
+    #"seoul_corpus": r"D:\Data\speech\benchmark_datasets\seoul_corpus\seoul_corpus_lab",
 }
 
 reference_directories = {
     "timit": r"D:\Data\speech\benchmark_datasets\timit\timit_reference",
     "buckeye": r"D:\Data\speech\benchmark_datasets\buckeye\buckeye_corpus_lab_reference",
-    "csj": r"D:\Data\speech\benchmark_datasets\csj\csj_lab_reference",
-    "seoul_corpus": r"D:\Data\speech\benchmark_datasets\seoul_corpus\seoul_corpus_lab_reference",
+    #"csj": r"D:\Data\speech\benchmark_datasets\csj\csj_lab_reference",
+    #"seoul_corpus": r"D:\Data\speech\benchmark_datasets\seoul_corpus\seoul_corpus_lab_reference",
 }
 
 
@@ -46,15 +46,30 @@ def align_words(
         new_test = []
         try:
             for t in test:
+                if t.label in {'sil', '#'}:
+                    continue
                 if len(new_test) and ref[len(new_test) - 1].label.startswith(new_test[-1].label + t.label):
                     new_test[-1].label += t.label
                     new_test[-1].end = t.end
                 elif len(new_test) and ref[len(new_test) - 1].label.startswith(new_test[-1].label + '-' + t.label):
                     new_test[-1].label += '-' + t.label
                     new_test[-1].end = t.end
+                elif len(new_test) and ref[len(new_test) - 1].label.startswith(new_test[-1].label + "'" + t.label):
+                    new_test[-1].label += "'" + t.label
+                    new_test[-1].end = t.end
+                elif len(new_test) and ref[len(new_test) - 1].label == t.label == new_test[-1].label:
+                    new_test[-1].end = t.end
                 else:
                     new_test.append(t)
             test = new_test
+            if len(ref) != len(test):
+                print(ref)
+                print(test)
+                print(new_test)
+                print(len(new_test))
+                print(len(ref), len(new_test))
+                print(ref[len(new_test) - 1])
+                return None, None
             assert len(ref) == len(test)
         except Exception:
             print(ref)
@@ -172,8 +187,6 @@ if __name__ == "__main__":
     ]
     for corpus, root in corpus_directories.items():
         for condition in os.listdir(os.path.join(root_alignment_dir, corpus)):
-            if not condition.startswith("arpa") and not condition.startswith("mfa"):
-                continue
             aligned_directory = os.path.join(root_alignment_dir, corpus, condition)
             output_directory = os.path.join(root_dir, "alignments", corpus, condition)
             csv_path = os.path.join(output_directory, "word_alignment.csv")
@@ -199,6 +212,8 @@ if __name__ == "__main__":
                         reference, file_duration = parse_aligned_textgrid(os.path.join(reference_directories[corpus], speaker, file_name))
                         word_index = 0
                         alignment_score, b_data = align_words(reference, word_intervals)
+                        if alignment_score is None:
+                            continue
                         words_per_second = len(reference) / file_duration
                         data = {
                             "file": file_name.replace(".TextGrid", ""),

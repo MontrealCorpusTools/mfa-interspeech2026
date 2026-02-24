@@ -43,17 +43,17 @@ boundary_data$corpus = factor(boundary_data$corpus)
 boundary_data$abs_boundary_error = abs(boundary_data$boundary_error)
 
 # MFA models for comparison across aligners are the adapted, but might still be worth quantifying/showing effect of adaptation
-mfa3_data <- subset(data, evaluation %in% c("mfa_3.1", "mfa_3.1_adapted", "arpa_3.0", "arpa_3.0_adapted"))
-data <- subset(data, !evaluation %in% c("mfa_3.1", "arpa_3.0"))
-data[data$evaluation=="mfa_3.1_adapted",]$evaluation <- "mfa_3.1"
-data[data$evaluation=="arpa_3.0_adapted",]$evaluation <- "arpa_3.0"
-data$evaluation = factor(data$evaluation)
+#mfa3_data <- subset(data, evaluation %in% c("mfa_3.1", "mfa_3.1_adapted", "arpa_3.0", "arpa_3.0_adapted"))
+#data <- subset(data, !evaluation %in% c("mfa_3.1", "arpa_3.0"))
+#data[data$evaluation=="mfa_3.1_adapted",]$evaluation <- "mfa_3.1"
+#data[data$evaluation=="arpa_3.0_adapted",]$evaluation <- "arpa_3.0"
+#data$evaluation = factor(data$evaluation)
 
-mfa3_boundary_data <- subset(boundary_data, evaluation %in% c("arpa_1.0", "mfa_3.1", "mfa_3.1_adapted", "arpa_3.0", "arpa_3.0_adapted"))
-boundary_data <- subset(boundary_data, !evaluation %in% c("mfa_3.1", "arpa_3.0"))
-boundary_data[boundary_data$evaluation=="mfa_3.1_adapted",]$evaluation <- "mfa_3.1"
-boundary_data[boundary_data$evaluation=="arpa_3.0_adapted",]$evaluation <- "arpa_3.0"
-boundary_data$evaluation = factor(boundary_data$evaluation)
+#mfa3_boundary_data <- subset(boundary_data, evaluation %in% c("arpa_1.0", "mfa_3.1", "mfa_3.1_adapted", "arpa_3.0", "arpa_3.0_adapted"))
+#boundary_data <- subset(boundary_data, !evaluation %in% c("mfa_3.1", "arpa_3.0"))
+#boundary_data[boundary_data$evaluation=="mfa_3.1_adapted",]$evaluation <- "mfa_3.1"
+#boundary_data[boundary_data$evaluation=="arpa_3.0_adapted",]$evaluation <- "arpa_3.0"
+#boundary_data$evaluation = factor(boundary_data$evaluation)
 
 
 test_phone_lists = list(
@@ -77,11 +77,11 @@ test_phone_lists = list(
   ),
   mfa=list(
     vowel=c("a", "ɐ", "ɑ", "ɒ", "aː", "ɑː", "ɒː", "æ", "aj", "aw", "ɔj", "e", "ə", "ɚ", "eː", "ej", "ɛ", "ɝ", "ɛː", "ɥ i", "ɥ iː", "i", "ɪ", "ɨ", "i̥", "ɨ̥", "iː", "ɨː","j ɐ", "j e", "j eː", "j ɛː", "j o", "j oː", "j u", "j uː", "j ʌ", "j ʌː",  "ɯ", "ɯ̥","ɰ i", "ɰ iː", "ɯː", "o", "oː", "ow", "u", "ʉ", "ʊ", "uː", "ʉː", "ʌ", "ʌː",  "w ɐ", "w e", "w eː", "w ʌ", "w ʌː"),
-    stop=c("b", "bʲ", "c", "c͈","cː","cʰ","cʷ","d", "d̪","dː", "dʲ","ɡ", "ɡː", "ɡʷ", "ɟ", "ɟʷ", "k", "k̚", "k͈", "kː", "k͈ː", "kʰ", "kʷ", "k͈ʷ","p", "p̚", "p͈","pː","pʰ", "pʲ", "p͈ʲ","pʲː", "pʷ", "t", "t̚", "t̪", "t͈", "tː", "tʰ", "tʲ", "t��ʲ", "tʲː", "tʷ", "ʔ", "t͈ʲ"),
+    stop=c("pʰː","b", "bʲ", "c", "c͈","cː","cʰ","cʷ","d", "d̪","dː", "dʲ","ɡ", "ɡː", "ɡʷ", "ɟ", "ɟʷ", "k", "k̚", "k͈", "kː", "k͈ː", "kʰ", "kʷ", "k͈ʷ","p", "p̚", "p͈","pː","pʰ", "pʲ", "p͈ʲ","pʲː", "pʷ", "t", "t̚", "t̪", "t͈", "tː", "tʰ", "tʲ", "t��ʲ", "tʲː", "tʷ", "ʔ", "t͈ʲ"),
     approximant=c("ɥ", "j", "l", "ɫ", "ɭ", "ɫ̩", "ɭː","ɰ",  "ɹ", "ɾ","ɾʲ", "w", "ʎ", "ʎː"),
     nasal=c("m", "m̩","ɰ̃","mː", "mʲ", "mʲː", "n", "ɴ", "ɲ", "n̩", "nː", "ɴː", "ɲː", "ŋ","ɾ̃"),
     fricative=c("ç", "ð", "f", "fʲ", "ɣ", "h", "ɦ", "ʝ", "ɸ", "ɸː", "ɸʲ", "ɸʷ","v","vʲ", "x",  "β", "βʷ", "θ"),
-    sibilant=c("ɕ", "ɕ͈","ɕː","s", "s͈", "ʃ", "sː", "sʰ", "sʷ","z", "ʑ", "ʒ", "ɕʰ", "dz", "dʑ", "dʑː", "dʒ", "tɕ", "tɕ͈", "tɕː", "tɕʰ", "tɕʷ", "tɕ͈ʷ","ts", "tʃ", "tsː"),
+    sibilant=c("s͈ː","t s", "d z", "tɕ͈ː", "ɕ", "ɕ͈","ɕː","s", "s͈", "ʃ", "sː", "sʰ", "sʷ","z", "ʑ", "ʒ", "ɕʰ", "dz", "dʑ", "dʑː", "dʒ", "tɕ", "tɕ͈", "tɕː", "tɕʰ", "tɕʷ", "tɕ͈ʷ","ts", "tʃ", "tsː"),
     silence=c('sil')
   ),
   gp=list(
@@ -194,15 +194,12 @@ reference_phone_lists = list(
     vowel=c('o', 'o H', 'a', 'a H', 'e', 'e H', 'i', 'i H', 'u', 'u H', 'H'),
     stop=c('b', 'by', 'bj', 'd', 'dy', 'dj', 'g', 'gy', 'gj', 'k', 'ky', 'kj', 'kw', 'p', 'py', 'Q', 'Q d', 'Q g', 'Q k','Q kj', 'Q ky', 'Q p', 'Q py', 'Q t', 't', 'ty', 'tj'),
     approximant=c('r', 'ry', 'w', 'y'),
-    nasal=c('m', 'n','my', 'N', 'N m', 'N my', 'N N', 'N n', 'N nj', 'N ny', 'nj', 'ny'),
+    nasal=c('m', 'n','my', 'N', 'N m', 'N my', 'N N', 'N H', 'N n', 'N nj', 'N ny', 'nj', 'ny'),
     fricative=c('F', 'Fy', 'h', 'hy', 'Q F', 'v', 'hj'),
     sibilant=c('Q s', 'Q sj', 'Q sy', 'Q zj', 's', 'sj', 'sy', 'z', 'zj', 'zy', 'c', 'cj', 'cy', 'Q c', 'Q cj', 'Q cy'),
     silence=c('sil')
   )
 )
-boundary_data[boundary_data$previous_test_phone %in% c( "ER0", "ER1", 'ER2', 'R', "3:", "3`", "3:r","r\\") & boundary_data$previous_reference_phone %in% c( "axr","r", "er")& boundary_data$corpus %in% c('timit', 'buckeye'),]$previous_test_category = boundary_data[boundary_data$previous_test_phone %in% c( "ER0", "ER1", 'ER2', 'R', "3:", "3`", "3:r","r\\") & boundary_data$previous_reference_phone %in% c( "axr","r", "er")& boundary_data$corpus %in% c('timit', 'buckeye'),]$previous_reference_category
-
-boundary_data[boundary_data$following_test_phone %in% c( "ER0", "ER1", 'ER2', 'R', "3:", "3`", "3:r","r\\") & boundary_data$following_reference_phone %in% c( "axr","r", "er")& boundary_data$corpus %in% c('timit', 'buckeye'),]$following_test_category = boundary_data[boundary_data$following_test_phone %in% c( "ER0", "ER1", 'ER2', 'R', "3:", "3`", "3:r","r\\") & boundary_data$following_reference_phone %in% c( "axr","r", "er")& boundary_data$corpus %in% c('timit', 'buckeye'),]$following_reference_category
 
 
 boundary_data$previous_reference_category <- "unknown"
@@ -214,6 +211,16 @@ for (n in names(reference_phone_lists)) {
     boundary_data[boundary_data$following_reference_phone %in% reference_phone_lists[[n]][[category]] & boundary_data$corpus == n,]$following_reference_category = category
   }
 }
+
+boundary_data[boundary_data$previous_test_phone %in% c( "ER0", "ER1", 'ER2', 'R', "3:", "3`", "3:r","r\\") & boundary_data$previous_reference_phone %in% c( "axr","r", "er")& boundary_data$corpus %in% c('timit', 'buckeye'),]$previous_test_category = boundary_data[boundary_data$previous_test_phone %in% c( "ER0", "ER1", 'ER2', 'R', "3:", "3`", "3:r","r\\") & boundary_data$previous_reference_phone %in% c( "axr","r", "er")& boundary_data$corpus %in% c('timit', 'buckeye'),]$previous_reference_category
+
+boundary_data[boundary_data$following_test_phone %in% c( "ER0", "ER1", 'ER2', 'R', "3:", "3`", "3:r","r\\") & boundary_data$following_reference_phone %in% c( "axr","r", "er")& boundary_data$corpus %in% c('timit', 'buckeye'),]$following_test_category = boundary_data[boundary_data$following_test_phone %in% c( "ER0", "ER1", 'ER2', 'R', "3:", "3`", "3:r","r\\") & boundary_data$following_reference_phone %in% c( "axr","r", "er")& boundary_data$corpus %in% c('timit', 'buckeye'),]$following_reference_category
+
+boundary_data[boundary_data$following_test_phone %in% c( "v") & boundary_data$following_reference_phone %in% c( "b")& boundary_data$corpus %in% c('csj'),]$following_test_category = boundary_data[boundary_data$following_test_phone %in% c( "v") & boundary_data$following_reference_phone %in% c( "b")& boundary_data$corpus %in% c('csj'),]$following_reference_category
+
+boundary_data[boundary_data$following_test_phone %in% c( "d", "dʲ") & boundary_data$following_reference_phone %in% c( "nn")& boundary_data$corpus %in% c('seoul_corpus'),]$following_test_category = boundary_data[boundary_data$following_test_phone %in% c( "d", "dʲ") & boundary_data$following_reference_phone %in% c( "nn")& boundary_data$corpus %in% c('seoul_corpus'),]$following_reference_category
+
+boundary_data[boundary_data$previous_test_phone %in% c( "d", "dʲ") & boundary_data$previous_reference_phone %in% c( "nn")& boundary_data$corpus %in% c('seoul_corpus'),]$previous_test_category = boundary_data[boundary_data$previous_test_phone %in% c( "d", "dʲ") & boundary_data$previous_reference_phone %in% c( "nn")& boundary_data$corpus %in% c('seoul_corpus'),]$previous_reference_category
 
 
 for (cor in levels(boundary_data$corpus)){
@@ -252,9 +259,10 @@ View(subset(boundary_data, evaluation == 'sppas'& corpus == 'buckeye' & previous
 View(subset(boundary_data, evaluation == 'maus'& corpus == 'csj' & previous_test_category == 'unknown'))
 
 
-View(subset(boundary_data, evaluation == 'maps' & previous_reference_category != previous_test_category & corpus == 'timit'))
+View(subset(boundary_data, evaluation == 'mfa_trained_rules' & previous_reference_category != previous_test_category & corpus == 'seoul_corpus'))
 
 View(filtered_data %>% subset(!is.na(alignment_score)) %>% group_by(corpus, evaluation) %>% summarise(mean_phone_error_rate= round(mean(phone_error_rate) *100,2), mean_alignment_score= round(mean(alignment_score) *1000,2)))
 
 
 head(filtered_data %>% subset(!is.na(alignment_score) & evaluation == 'maps' & corpus == 'timit') %>% arrange(desc(phone_error_rate)))
+

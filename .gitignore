@@ -215,3 +215,5 @@ __marimo__/
 .RDataTmp
 
 .RDataTmp1
+
+*.csv
