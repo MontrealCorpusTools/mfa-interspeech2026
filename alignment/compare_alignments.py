@@ -139,6 +139,8 @@ if __name__ == "__main__":
                 phone_set = "mfa"
             elif "gp" in condition:
                 phone_set = 'gp'
+            elif "maps" in condition:
+                phone_set = 'maps'
             else:
                 phone_set = condition
             if "remapped" in condition:

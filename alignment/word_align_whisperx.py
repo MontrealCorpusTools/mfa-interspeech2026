@@ -55,15 +55,15 @@ def align_words(
         error_sum += abs(r.begin - t.begin)
         error_sum += abs(r.end - t.end)
         boundary_count += 2
-        if i != 0:
-            prev_ref, prev_test =ref[i - 1], test[i-1]
+        if i != len(ref) - 1:
+            prev_ref, prev_test =ref[i + 1], test[i+1]
             boundary_errors.append(
                 {
                     "following_word": r.label,
                     "previous_word": prev_ref.label,
-                    "boundary_error": round(r.begin - t.begin, 3),
-                    "reference_boundary": round(r.begin, 3),
-                    "test_boundary": round(t.begin, 3),
+                    "boundary_error": round(r.end - t.end, 3),
+                    "reference_boundary": round(r.end, 3),
+                    "test_boundary": round(t.end, 3),
                 }
             )
         else:
@@ -71,9 +71,9 @@ def align_words(
                 {
                     "following_word": r.label,
                     "previous_word": "silence",
-                    "boundary_error": round(r.begin - t.begin, 3),
-                    "reference_boundary": round(r.begin, 3),
-                    "test_boundary": round(t.begin, 3),
+                    "boundary_error": round(r.end - t.end, 3),
+                    "reference_boundary": round(r.end, 3),
+                    "test_boundary": round(t.end, 3),
                 }
             )
     boundary_errors.append(
@@ -279,6 +279,7 @@ if __name__ == "__main__":
                                 )
                             )
                             score_sum += word["score"]
+
                         ctm = HierarchicalCtm(word_intervals)
                         alignment_likelihood = score_sum / len(words)
                         file_ctm.word_intervals.extend(ctm.word_intervals)

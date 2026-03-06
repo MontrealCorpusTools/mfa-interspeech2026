@@ -40,14 +40,17 @@ def align_words(
     ref: typing.List[CtmInterval],
     test: typing.List[CtmInterval],
 ):
+    test = [x for x in test if x.label not in {'sil', '#'}]
     try:
         assert len(ref) == len(test)
     except AssertionError:
+        print("ORIGINAL")
+        print(ref)
+        print(test)
+        print("--------")
         new_test = []
         try:
             for t in test:
-                if t.label in {'sil', '#'}:
-                    continue
                 if len(new_test) and ref[len(new_test) - 1].label.startswith(new_test[-1].label + t.label):
                     new_test[-1].label += t.label
                     new_test[-1].end = t.end
@@ -57,12 +60,11 @@ def align_words(
                 elif len(new_test) and ref[len(new_test) - 1].label.startswith(new_test[-1].label + "'" + t.label):
                     new_test[-1].label += "'" + t.label
                     new_test[-1].end = t.end
-                elif len(new_test) and ref[len(new_test) - 1].label == t.label == new_test[-1].label:
+                elif len(new_test) and ref[len(new_test) - 1].label == t.label == new_test[-1].label and len(ref) >= len(new_test) and ref[len(new_test)].label != t.label:
                     new_test[-1].end = t.end
                 else:
                     new_test.append(t)
-            test = new_test
-            if len(ref) != len(test):
+            if len(ref) != len(new_test):
                 print(ref)
                 print(test)
                 print(new_test)
@@ -70,6 +72,7 @@ def align_words(
                 print(len(ref), len(new_test))
                 print(ref[len(new_test) - 1])
                 return None, None
+            test = new_test
             assert len(ref) == len(test)
         except Exception:
             print(ref)
@@ -208,6 +211,7 @@ if __name__ == "__main__":
                         continue
                     for file_name in os.listdir(speaker_directory):
 
+                        print(file_name)
                         word_intervals, _ = parse_aligned_textgrid(os.path.join(speaker_directory, file_name))
                         reference, file_duration = parse_aligned_textgrid(os.path.join(reference_directories[corpus], speaker, file_name))
                         word_index = 0

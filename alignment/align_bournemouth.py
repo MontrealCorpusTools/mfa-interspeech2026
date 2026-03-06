@@ -20,9 +20,9 @@ else:
     root_dir = r"/mnt/d/Data/experiments/interspeech_benchmarking"
 
     corpus_directories = {
-        #"timit": r"/mnt/d/Data/speech/benchmark_datasets/timit/timit_benchmark",
+        "timit": r"/mnt/d/Data/speech/benchmark_datasets/timit/timit_benchmark",
         #"buckeye": r"/mnt/d/Data/speech/benchmark_datasets/buckeye/buckeye_corpus_lab",
-        "csj": r"/mnt/d/Data/speech/benchmark_datasets/csj/csj_lab",
+        #"csj": r"/mnt/d/Data/speech/benchmark_datasets/csj/csj_lab",
         #"seoul_corpus": r"/mnt/d/Data/speech/benchmark_datasets/seoul_corpus/seoul_corpus_lab",
     }
 
@@ -68,13 +68,15 @@ if __name__ == "__main__":
             output_speaker_directory = os.path.join(output_directory, speaker)
             os.makedirs(output_speaker_directory, exist_ok=True)
             for f in os.listdir(speaker_directory):
+                if "DR2_MZMB0_SX446" not in f:
+                    continue
                 if not f.endswith(".wav"):
                      continue
                 audio_path = os.path.join(speaker_directory, f)
                 text_path = os.path.join(speaker_directory, f.replace(".wav", ".txt"))
                 output_path = os.path.join(output_speaker_directory, f.replace(".wav", ".TextGrid"))
-                if os.path.exists(output_path):
-                    continue
+                #if os.path.exists(output_path):
+                #    continue
                 if not os.path.exists(text_path):
                     text_path = text_path.replace(".txt", ".lab")
                 with open(text_path, encoding='utf8') as inf:
@@ -136,3 +138,8 @@ if __name__ == "__main__":
                 except Exception:
                     print(f)
                     raise
+                if "DR2_MZMB0_SX446" in f:
+                    print(timestamps)
+                    print(word_intervals)
+                    print(phone_intervals)
+                    error

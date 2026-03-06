@@ -61,21 +61,6 @@ recall_boundary_data$evaluation = factor(recall_boundary_data$evaluation)
 recall_boundary_data$corpus = factor(recall_boundary_data$corpus)
 recall_boundary_data$abs_boundary_error = abs(recall_boundary_data$boundary_error)
 
-naive_data <- subset(naive_data, !evaluation %in% c("mfa_3.1", "arpa_3.0"))
-naive_data[naive_data$evaluation=="mfa_3.1_adapted",]$evaluation <- "mfa_3.1"
-naive_data[naive_data$evaluation=="arpa_3.0_adapted",]$evaluation <- "arpa_3.0"
-naive_data$evaluation = factor(naive_data$evaluation)
-
-precision_boundary_data <- subset(precision_boundary_data, !evaluation %in% c("mfa_3.1", "arpa_3.0"))
-precision_boundary_data[precision_boundary_data$evaluation=="mfa_3.1_adapted",]$evaluation <- "mfa_3.1"
-precision_boundary_data[precision_boundary_data$evaluation=="arpa_3.0_adapted",]$evaluation <- "arpa_3.0"
-precision_boundary_data$evaluation = factor(precision_boundary_data$evaluation)
-
-recall_boundary_data <- subset(recall_boundary_data, !evaluation %in% c("mfa_3.1", "arpa_3.0"))
-recall_boundary_data[recall_boundary_data$evaluation=="mfa_3.1_adapted",]$evaluation <- "mfa_3.1"
-recall_boundary_data[recall_boundary_data$evaluation=="arpa_3.0_adapted",]$evaluation <- "arpa_3.0"
-recall_boundary_data$evaluation = factor(recall_boundary_data$evaluation)
-
 
 
 precision_boundary_data$previous_test_category <- "unknown"
@@ -157,3 +142,11 @@ f1_table_filtered = recall_table_filtered %>% add_column(precision_thresh_20ms=p
 recall_boundary_data %>% subset(corpus=='timit' & evaluation != 'bournemouth') %>% mutate(filtered = previous_reference_category != previous_test_category | following_reference_category != following_test_category | following_test_category == 'unknown' | following_reference_category == 'unknown' | previous_test_category == "unknown" | previous_reference_category == "unknown") %>% group_by(evaluation,file) %>% summarise(n_filtered=sum(filtered)) %>% pivot_wider(names_from=evaluation, values_from=n_filtered, names_prefix="n_filtered_") %>% arrange(desc(n_filtered_maus))
 
 View(subset(recall_boundary_data, file == 'DR6_MSDS0_SI1077' & evaluation == 'maus') %>% mutate(filtered = previous_reference_category != previous_test_category | following_reference_category != following_test_category | following_test_category == 'unknown' | following_reference_category == 'unknown' | previous_test_category == "unknown" | previous_reference_category == "unknown"))
+
+
+View(boundary_data %>% subset(evaluation == 'maus' & corpus =='timit') %>% group_by(previous_reference_phone, following_reference_phone) %>% summarise(mean_error=mean(abs_boundary_error),count=n()) %>% arrange(desc(count)))
+View(boundary_data %>% subset(evaluation == 'mfa_3.1' & corpus =='timit') %>% group_by(previous_reference_phone, following_reference_phone) %>% summarise(mean_error=mean(abs_boundary_error),count=n()) %>% arrange(desc(count)))
+
+View(filtered_boundary_data %>% subset(evaluation == 'maus' & corpus =='timit') %>% group_by(previous_reference_phone) %>% summarise(mean_error=mean(abs_boundary_error),count=n()) %>% arrange(desc(count)))
+
+View(filtered_boundary_data %>% subset(evaluation == 'arpa_3.0' & corpus =='timit') %>% group_by(previous_reference_phone) %>% summarise(mean_error=mean(abs_boundary_error),count=n()) %>% arrange(desc(count)))
