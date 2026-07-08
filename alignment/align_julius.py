@@ -1,3 +1,6 @@
+"""
+Uses environment_files/julius_environment.yaml
+"""
 import shutil
 
 import soundfile as sf

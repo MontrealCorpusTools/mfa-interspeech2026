@@ -1,6 +1,9 @@
+"""
+Uses environment_files/bfa_environment.yaml
+"""
+
 import re
 import time
-import json
 import sudachipy
 import os
 from praatio import textgrid as tgio
@@ -21,9 +24,9 @@ else:
 
     corpus_directories = {
         "timit": r"/mnt/d/Data/speech/benchmark_datasets/timit/timit_benchmark",
-        #"buckeye": r"/mnt/d/Data/speech/benchmark_datasets/buckeye/buckeye_corpus_lab",
-        #"csj": r"/mnt/d/Data/speech/benchmark_datasets/csj/csj_lab",
-        #"seoul_corpus": r"/mnt/d/Data/speech/benchmark_datasets/seoul_corpus/seoul_corpus_lab",
+        "buckeye": r"/mnt/d/Data/speech/benchmark_datasets/buckeye/buckeye_corpus_lab",
+        "csj": r"/mnt/d/Data/speech/benchmark_datasets/csj/csj_lab",
+        "seoul_corpus": r"/mnt/d/Data/speech/benchmark_datasets/seoul_corpus/seoul_corpus_lab",
     }
 
 

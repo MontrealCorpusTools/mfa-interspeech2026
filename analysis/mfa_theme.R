@@ -30,7 +30,7 @@ blog_dpi = 175
 
 windowsFonts("Gentium Book Plus" = windowsFont("Gentium Book Plus"))
 
-cbbPalette <- c("#FB5607", "#8338EC", "#FF006E", "#FFBE0B",  "#3A86FF", '#6EC200', '#BA3200', "#009E73")
+cbbPalette <- c("#FB5607",'#6EC200', "#FF006E", "#3A86FF", '#BA3200',  "#8338EC", "#FFBE0B",  "#009E73")
 
 
 very_light_yellow = '#FFE819'

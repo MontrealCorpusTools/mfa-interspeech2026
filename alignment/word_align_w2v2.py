@@ -1,8 +1,12 @@
-"""Based on https://pytorch.org/audio/stable/tutorials/ctc_forced_alignment_api_tutorial.html"""
+"""
+Based on https://pytorch.org/audio/stable/tutorials/ctc_forced_alignment_api_tutorial.html
+
+Uses environment_files/mfa_environment.yaml
+"""
+
 import csv
 import os
 import re
-import sys
 import typing
 import torch
 import torchaudio
@@ -10,10 +14,8 @@ import torchaudio.functional as F
 import tqdm
 import sqlalchemy
 from kalpy.gmm.data import CtmInterval, HierarchicalCtm, WordCtmInterval
-from montreal_forced_aligner import config
-from montreal_forced_aligner.command_line.mfa import mfa_cli
 from montreal_forced_aligner.corpus.acoustic_corpus import AcousticCorpus
-from montreal_forced_aligner.db import File, Utterance, Word, WordInterval
+from montreal_forced_aligner.db import File, Utterance
 from montreal_forced_aligner.exceptions import TextGridParseError
 from montreal_forced_aligner.helper import mfa_open
 from praatio import textgrid as tgio
@@ -23,15 +25,11 @@ root_dir = r"D:\Data\experiments\interspeech_benchmarking\word_alignments"
 corpus_directories = {
     "timit": r"D:\Data\speech\benchmark_datasets\timit\timit_benchmark",
     "buckeye": r"D:\Data\speech\benchmark_datasets\buckeye\buckeye_corpus_lab",
-    #"csj": r"D:\Data\speech\benchmark_datasets\csj\csj_lab",
-    #"seoul_corpus": r"D:\Data\speech\benchmark_datasets\seoul_corpus\seoul_corpus_lab",
 }
 
 reference_directories = {
     "timit": r"D:\Data\speech\benchmark_datasets\timit\timit_reference",
     "buckeye": r"D:\Data\speech\benchmark_datasets\buckeye\buckeye_corpus_lab_reference",
-    "csj": r"D:\Data\speech\benchmark_datasets\csj\csj_lab_reference",
-    "seoul_corpus": r"D:\Data\speech\benchmark_datasets\seoul_corpus\seoul_corpus_lab_reference",
 }
 
 
@@ -175,8 +173,6 @@ def parse_aligned_textgrid(path: str, exclude_unknowns=True) -> typing.List[CtmI
             if not text:
                 continue
             begin, end = round(begin, 4), round(end, 4)
-            # if end - begin < 0.01:
-            #    continue
             interval = CtmInterval(begin, end, text)
             data.append(interval)
     return data

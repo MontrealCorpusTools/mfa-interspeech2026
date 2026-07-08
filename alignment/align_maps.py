@@ -1,7 +1,9 @@
+"""
+Uses environment_files/julius_environment.yaml
+"""
 import subprocess
 import os
 import sys
-import random
 if sys.platform == 'win32':
     root_dir = r"D:\Data\experiments\interspeech_benchmarking"
 
