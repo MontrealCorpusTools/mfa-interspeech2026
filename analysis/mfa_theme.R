@@ -23,6 +23,7 @@ library(dplyr)
 library(plotly)
 library(trelliscopejs)
 library(stringr)
+library(ggokabeito)
 
 blog_width = 2400
 blog_height =1000

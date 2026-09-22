@@ -266,3 +266,95 @@ View(filtered_data %>% subset(!is.na(alignment_score)) %>% group_by(corpus, eval
 
 head(filtered_data %>% subset(!is.na(alignment_score) & evaluation == 'maps' & corpus == 'timit') %>% arrange(desc(phone_error_rate)))
 
+
+# Interspeech plots
+
+
+cbbPalette <- c("#c5050c", "#006992", "#adadad", "#432e4f", "#8dd3ce", "#fccb51")
+
+## English
+
+plotData <- summarySE(data=subset(boundary_data, evaluation %in% c("arpa_1.0", "arpa_3.0", "maus", "maps", "charsiu", "bournemouth", "sppas", "julius", "koreanforcedaligner") & corpus %in% c("buckeye", "timit")), measurevar = 'abs_boundary_error', groupvars=c("evaluation", "corpus"))
+
+plotData$evaluation = factor(plotData$evaluation, levels = c("arpa_3.0", "arpa_1.0", "maus", "sppas", "julius", "koreanforcedaligner", "maps", "charsiu", "bournemouth"), labels= c("MFA 3.0", "MFA 1.0", "MAUS", "SPPAS", "Julius", "KFA", "MAPS*", "Charsiu*", "BFA*"))
+plotData$corpus = factor(plotData$corpus, levels= c("timit", "buckeye"), labels=c("TIMIT", "Buckeye"))
+
+ggplot(aes(x=evaluation, y=mean * 1000, color=corpus), data=plotData) + geom_point(size = 3) +
+  geom_errorbar(aes(ymin = (mean - ci) * 1000, ymax = (mean + ci)* 1000),size=1, width=0.25) +
+  ylab('Phone boundary error (ms)') + xlab('Aligner') +ggtitle('Phone boundary errors in English') +
+  theme_minimal(base_size = 16) +
+  scale_y_continuous(limits=c(10, 50), expand = c(0,0)) +
+  theme(
+    panel.grid.minor = element_blank(), 
+    panel.border = element_rect(color = "grey40", fill = NA)
+  ) + 
+  ggokabeito::scale_color_okabe_ito(name="Corpus")
+  #scale_color_manual(values=cbbPalette, name="Corpus")
+
+ggsave("output/interspeech_english_boundaries.png", width=13.33, height=7.5, dpi=600)
+
+## Japanese
+
+plotData <- summarySE(data=subset(boundary_data, evaluation %in% c("mfa_1.0", "mfa_3.1", "maus", "maps", "charsiu", "bournemouth", "sppas", "julius", "koreanforcedaligner") & corpus %in% c("csj")), measurevar = 'abs_boundary_error', groupvars=c("evaluation", "corpus"))
+
+plotData$evaluation = factor(plotData$evaluation, levels = c("mfa_3.1", "mfa_1.0", "maus", "sppas", "julius", "koreanforcedaligner", "maps", "charsiu", "bournemouth"), labels= c("MFA 3.0", "MFA 1.0", "MAUS", "SPPAS", "Julius", "KFA", "MAPS*", "Charsiu*", "BFA*"))
+plotData$corpus = factor(plotData$corpus, levels= c("csj"), labels=c("CSJ"))
+
+ggplot(aes(x=evaluation, y=mean * 1000, color=corpus), data=plotData) + geom_point(size = 3) +
+  geom_errorbar(aes(ymin = (mean - ci) * 1000, ymax = (mean + ci)* 1000),size=1, width=0.25) +
+  ylab('Phone boundary error (ms)') + xlab('Aligner') +ggtitle('Phone boundary errors in Japanese') +
+  scale_y_continuous(limits=c(10, 80), expand = c(0,0), breaks=c(10,20,40,60,80)) +
+  theme_minimal(base_size = 16) +
+  theme(
+    panel.grid.minor = element_blank(), 
+    panel.border = element_rect(color = "grey40", fill = NA)
+  ) +
+  ggokabeito::scale_color_okabe_ito(name="Corpus")
+#scale_color_manual(values=cbbPalette, name="Corpus")
+
+ggsave("output/interspeech_japanese_boundaries.png", width=13.33, height=7.5, dpi=600)
+
+## Korean
+
+plotData <- summarySE(data=subset(boundary_data, evaluation %in% c("gp_1.0", "mfa_3.1", "maus", "maps", "charsiu", "bournemouth", "sppas", "julius", "koreanforcedaligner") & corpus %in% c("seoul_corpus")), measurevar = 'abs_boundary_error', groupvars=c("evaluation", "corpus"))
+
+plotData$evaluation = factor(plotData$evaluation, levels = c("mfa_3.1", "gp_1.0", "maus", "sppas", "julius", "koreanforcedaligner", "maps", "charsiu", "bournemouth"), labels= c("MFA 3.0", "MFA 1.0", "MAUS", "SPPAS", "Julius", "KFA", "MAPS*", "Charsiu*", "BFA*"))
+plotData$corpus = factor(plotData$corpus, levels= c("seoul_corpus"), labels=c("Seoul"))
+
+ggplot(aes(x=evaluation, y=mean * 1000, color=corpus), data=plotData) + geom_point(size = 3) +
+  geom_errorbar(aes(ymin = (mean - ci) * 1000, ymax = (mean + ci)* 1000),size=1, width=0.25) +
+  ylab('Phone boundary error (ms)') + xlab('Aligner') +ggtitle('Phone boundary errors in Korean') +
+  scale_y_continuous(limits=c(10, 90), expand = c(0,0), breaks=c(10,20,40,60,80)) +
+  theme_minimal(base_size = 16) +
+  theme(
+    panel.grid.minor = element_blank(), 
+    panel.border = element_rect(color = "grey40", fill = NA)
+  ) +
+  ggokabeito::scale_color_okabe_ito(name="Corpus")
+#scale_color_manual(values=cbbPalette, name="Corpus")
+
+ggsave("output/interspeech_korean_boundaries.png", width=13.33, height=7.5, dpi=600)
+
+
+# MFA 3.0 evaluations
+
+plotData <- summarySE(data=subset(boundary_data, evaluation %in% c("mfa_3.1", "mfa_3.1_adapted", "mfa_remapped", "mfa_remapped_adapted", "mfa_trained")), measurevar = 'abs_boundary_error', groupvars=c("evaluation", "corpus"))
+
+plotData$evaluation = factor(plotData$evaluation, levels = c("mfa_3.1", "mfa_3.1_adapted", "mfa_trained", "mfa_remapped", "mfa_remapped_adapted"), labels= c("Pretrained", "Adapted", "Trained", "English", "+Adapted"))
+plotData$corpus = factor(plotData$corpus, levels= c("timit", "buckeye", "csj", "seoul_corpus"), labels=c("TIMIT", "Buckeye", "CSJ", "Seoul"))
+
+ggplot(aes(x=evaluation, y=mean * 1000, color=corpus), data=plotData) + geom_point(size = 3) +
+  geom_errorbar(aes(ymin = (mean - ci) * 1000, ymax = (mean + ci)* 1000),size=1, width=0.25) +
+  ylab('Phone boundary error (ms)') + xlab('MFA model') +ggtitle('Phone boundary errors in MFA 3.0') +
+  theme_minimal(base_size = 16) +
+  theme(
+    panel.grid.minor = element_blank(), 
+    panel.border = element_rect(color = "grey40", fill = NA)
+  ) +
+  ggokabeito::scale_color_okabe_ito(name="Corpus") +
+  facet_wrap(~corpus, scales="free")+ guides(colour = "none")
+#scale_color_manual(values=cbbPalette, name="Corpus")
+
+ggsave("output/interspeech_mfa_boundaries.png", width=13.33, height=7.5, dpi=600)
+
+t <- subset(data, evaluation=="mfa_3.1" & corpus=="buckeye") %>% summarise(seconds_per_word=sum(duration)/sum(word_count), seconds_per_phone=sum(duration)/sum(reference_phone_count))
